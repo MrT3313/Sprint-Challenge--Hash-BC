@@ -21,10 +21,24 @@ def proof_of_work(last_proof):
     """
 
     start = timer()
-
+    
     print("Searching for next proof")
-    proof = 0
-    #  TODO: Your code here
+    # proof = 0
+    proof = random.randint(0,1000)
+
+    # TODO: Your code here
+    proof_string = f'{last_proof}'.encode()
+    last_hash = hashlib.sha256(proof_string).hexdigest()
+
+    while valid_proof(last_hash, proof) is False: 
+        # V1
+        proof += 1
+
+        # V2
+        # if timer() - start > 45:
+        #     print('Taking to long. Increment Proof. Restart')
+        #     return None
+        # proof = random.randint(0,1000)
 
     print("Proof found: " + str(proof) + " in " + str(timer() - start))
     return proof
@@ -39,8 +53,13 @@ def valid_proof(last_hash, proof):
     IE:  last_hash: ...AE9123456, new hash 123456E88...
     """
 
-    # TODO: Your code here!
-    pass
+    # Encode Guess
+    guess = f'{proof}'.encode()
+    # Hash Guess
+    guess_hash = hashlib.sha256(guess).hexdigest()
+
+    # Return True / False based on conditional
+    return last_hash[-6:] == guess_hash[:6]
 
 
 if __name__ == '__main__':
@@ -64,8 +83,13 @@ if __name__ == '__main__':
     # Run forever until interrupted
     while True:
         # Get the last proof from the server
+        # https://lambda-coin-test-1.herokuapp.com/api/last_proof
+        ## 12:24 = 5848877
+        print('Get Last Proof')
         r = requests.get(url=node + "/last_proof")
         data = r.json()
+
+        # Find Valid Proof
         new_proof = proof_of_work(data.get('proof'))
 
         post_data = {"proof": new_proof,
@@ -78,3 +102,5 @@ if __name__ == '__main__':
             print("Total coins mined: " + str(coins_mined))
         else:
             print(data.get('message'))
+
+        # break
