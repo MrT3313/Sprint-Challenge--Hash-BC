@@ -25,6 +25,21 @@ def proof_of_work(last_proof):
     print("Searching for next proof")
     proof = 0
     #  TODO: Your code here
+    proof = random.randint(0,1000)
+
+    # TODO: Your code here
+    proof_string = f'{last_proof}'.encode()
+    last_hash = hashlib.sha256(proof_string).hexdigest()
+
+    while valid_proof(last_hash, proof) is False: 
+        # V1
+        proof += 1
+
+        # V2
+        # if timer() - start > 45:
+        #     print('Taking to long. Increment Proof. Restart')
+        #     return None
+        # proof = random.randint(0,1000)
 
     print("Proof found: " + str(proof) + " in " + str(timer() - start))
     return proof
@@ -39,8 +54,13 @@ def valid_proof(last_hash, proof):
     IE:  last_hash: ...AE9123456, new hash 123456E88...
     """
 
-    # TODO: Your code here!
-    pass
+    # Encode Guess
+    guess = f'{proof}'.encode()
+    # Hash Guess
+    guess_hash = hashlib.sha256(guess).hexdigest()
+
+    # Return True / False based on conditional
+    return last_hash[-6:] == guess_hash[:6]
 
 
 if __name__ == '__main__':
